@@ -1,28 +1,26 @@
-from model.optionleg import OptionLeg
-from calculators.longcallstrategy import LongCallStrategy
-from calculators.longputstrategy import LongPutStrategy
-from calculators.shortcallstrategy import ShortCallStrategy
-from calculators.shortputstrategy import ShortPutStrategy
-from calculators.longunderlying import LongUnderlying
-
+from option_leg import *
+from view import *
 
 class PayOffCalculator:
     """The class that keeps a store of registered strategies and
     orchestrates the calls to them to calculate the payoffs"""
 
     def __init__(self):
+        self.legs_map = {}
         self.strategy_map = {}
+        self.view = View()
 
-    def register_strategy(self, strategy):
-        self.strategy_map[strategy.STRATEGY_NAME] = strategy
-
-    def print_registered_strategies(self):
-        for name in self.strategy_map.keys():
-            print("Strategy " + name + " registered with value " +
-                  self.strategy_map[name].STRATEGY_NAME)
-
+    def register_legs(self):
+        self.legs_map["Buy Call"] = Options('buy', 'call', 50, 5)
+        self.legs_map["Sell Call"] = Options('sell', 'call', 50, 5)
+        self.legs_map["Buy Put"] = Options('buy', 'put', 50, 5)
+        self.legs_map["Sell Call"] = Options('sell', 'put', 50, 5)
+        self.legs_map["Long Underlying"] = Underlying('long',50)
+        self.legs_map["Short Underlying"] = Underlying('short',50)
+        
     def calculate(self, legs):
-        return None
+        self.strategy_map['Long Straddle'] = self.legs_map['Buy Call'].buy_call() +
+                                            self.legs_map['Buy Put'].buy_put()
 
 
 '''Runner script'''
