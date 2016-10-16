@@ -1,92 +1,83 @@
 from option_leg import *
 from view import *
+from strategies import *
 
-class PayOffCalculator:
-    """The class that keeps a store of registered strategies and
-    orchestrates the calls to them to calculate the payoffs"""
 
+class Calculator:
     def __init__(self):
-        self.legs_map = {}
         self.strategy_map = {}
-        self.view = View()
-
-    def register_legs(self):
-        self.legs_map["Buy Call"] = Options('buy', 'call', 50, 5)
-        self.legs_map["Sell Call"] = Options('sell', 'call', 50, 5)
-        self.legs_map["Buy Put"] = Options('buy', 'put', 50, 5)
-        self.legs_map["Sell Call"] = Options('sell', 'put', 50, 5)
-        self.legs_map["Long Underlying"] = Underlying('long',50)
-        self.legs_map["Short Underlying"] = Underlying('short',50)
+        self.strategy = LongUnderlying()
+    # def register_strategy(self, strategy):
+    #     self.strategy_map[Option_Leg().get_key()]
         
-    def calculate(self, legs):
-        self.strategy_map['Long Straddle'] = self.legs_map['Buy Call'].buy_call() +
-                                            self.legs_map['Buy Put'].buy_put()
+        
+    def calculate(self, *args):
+        price = 0
+        payoff = {}
+        while price <= 100:
+            result = []
+            for leg in args:
+                result.append(self.strategy.calculate_payoff(leg.entry, price)) 
+                payoff[price] = sum(result)
+            price += 1
+        return payoff
+        
+if __name__ == "__main__":
+    result = Calculator()
+    print (result.calculate(Underlying("Long Underlying", 40), Underlying("Long Underlying", 50)))
+    
+        
+        
 
 
-'''Runner script'''
-p = PayOffCalculator()
+    # def buy_call(self, price, strike, premium):
+    #     if price <= strike:
+    #         payoff = 0 - premium
+    #     else:
+    #         payoff = price - strike - premium
+    #     return payoff
+        
+    # def buy_put(self, price, strike, premium):
+    #     if price <= strike:
+    #         payoff = strike- price - premium
+    #     else:
+    #         payoff = 0 - premium
+    #     return payoff
+        
+    # def sell_call(self, price, strike, premium):
+    #     if price <= strike:
+    #         payoff = premium
+    #     else:
+    #         payoff = strike - price + premium
+    #     return payoff
+        
+    # def sell_put(self, price, strike, premium):
+    #     if price <= strike:
+    #         payoff = price - strike + premium
+    #     else:
+    #         payoff = premium
+    #     return payoff
+    
+    # def long_underlying(self, price, entry):
+    #     payoff = price - entry
+    #     return payoff
+        
+    # def short_underlying(self, price, entry):
+    #     payoff = entry - price
+    #     return payoff
+    
+    # def calculate(self):
+    #     leg1 = Options("Buy","Call",50,5)
+    #     leg2 = Options("Buy", "Put",50,5)
+    #     self.strategy= [leg1,leg2]
+        
+    #     j = 0
+    #     payoff = {}
+    #     while j <= 100:
+    #         payoff[j] = self.buy_call(j, self.strategy_map['Long Straddle'][0].strike, self.strategy_map['Long Straddle'][0].premium) + self.buy_put(j,self.strategy_map['Long Straddle'][1].strike, self.strategy_map['Long Straddle'][1].premium)
+    #         j += 1
+    #     print (payoff)
+        
 
-strats = [LongPutStrategy(),
-          LongCallStrategy(),
-          ShortPutStrategy(),
-          ShortCallStrategy(),
-          LongUnderlying()]
-
-for strat in strats:
-    p.register_strategy(strat)
-
-# p.print_registered_strategies()
 
 
-# Test cases.
-# Long a call
-legs = [OptionLeg("Buy", "Call", 50, 10)]
-payoff = p.calculate(legs)
-assert payoff[0] == -10, "Long on a call, with the stock price below the \
-    strike has a payoff of negative the price"
-assert payoff[60] == 0, "Long on a call, with the stock price equal to \
-    the (strike + price) has a payoff of zero"
-assert payoff[90] == 30, "Long on a call, with the stock price above the \
-    strike, has a payoff of the difference between the stock price and \
-    the sum of the strike and price"
-
-
-# Short a put
-legs = [OptionLeg("Sell", "Put", 50, 10)]
-payoff = p.calculate(legs)
-assert payoff[0] == -40, "Short on a put, with the stock price below the \
-    strike has a payoff of the difference between (strike + price of option) \
-    and the stock price"
-assert payoff[50] == 10, "Short on a put, with the stock price equal to the \
-    strike, has a payoff that equals the sale price of the option"
-assert payoff[90] == 10, "Short on a put, with the stock price above the \
-    option strike price, has a payoff that equals the sale price of the \
-    option"
-
-# Straddle (Long a call and Long a put)
-legs = [OptionLeg("Buy", "Call", 50, 10), OptionLeg("Buy", "Put", 50, 10)]
-payoff = p.calculate(legs)
-assert payoff[0] == 30, "Long a call and long a put, with the stock price \
-    below strike price has a payoff that is the difference between the \
-    strike and (the stock price + price of call + price of put)"
-assert payoff[50] == -20, "Long a call and long a put, with the stock price \
-    at the strike, has a payoff that is the sum of the price of both options"
-assert payoff[90] == 20, "Long a call and long a put, with the stock price \
-    above the strike has a payoff that is the difference between the stock \
-    price and sum of the prices of the call and the put options"
-
-# Clipped reverse strangle
-legs = [OptionLeg("Sell", "Call", 60, 10), OptionLeg("Sell", "Put", 40, 10),
-        OptionLeg("Buy", "Put", 20, 10), OptionLeg("Buy", "Call", 80, 10)]
-payoff = p.calculate(legs)
-assert payoff[0] == -20, "A Clipped reverse strangle at a stock price below \
-    the lower strike, has a payoff that equals the sum of the difference \
-    between the strikes and the difference between \
-    the prices of the two put options"
-assert payoff[45] == 0, "A Clipped reverse strangle at a stock price between \
-    the higher strikes has a payoff equal to the difference between the sum \
-    of the two shorted legs and the sum of the two long legs"
-assert payoff[90] == -20, "A Clipped reverse strangle at a stock price above \
-    the highest strike, has a payoff that equals the sum of the difference \
-    between the strikes and the difference between \
-    the prices of the two call options"
