@@ -5,79 +5,45 @@ from strategies import *
 
 class Calculator:
     def __init__(self):
-        self.strategy_map = {}
-        self.strategy = LongUnderlying()
-    # def register_strategy(self, strategy):
-    #     self.strategy_map[Option_Leg().get_key()]
+        self.strategy_map = {"LongUnderlying": LongUnderlying(),
+                            "ShortUnderlying": ShortUnderlying(),
+                            "LongCall": LongCall(),
+                            "ShortCall": ShortCall(),
+                            "LongPut": LongPut(),
+                            "ShortPut": ShortPut()
+                            }
+                            
+    def register_legs(self, *args):
+        legs =[leg for leg in args]
+        return legs
+    
+    def register_strategy(self, legs):
+        registered_strategies = {}
+        for leg in legs:
+            if leg.get_key() in self.strategy_map:
+                registered_strategies[leg.get_key()] = [leg, self.strategy_map[leg.get_key()]]
+        return registered_strategies
         
-        
-    def calculate(self, *args):
+    def calculate(self, strategies):
         price = 0
         payoff = {}
         while price <= 100:
             result = []
-            for leg in args:
-                result.append(self.strategy.calculate_payoff(leg.entry, price)) 
+            for strat in strategies:
+                result.append(strategies[strat][1].calculate_payoff(strategies[strat][0].strike, strategies[strat][0].entry_price, price)) 
                 payoff[price] = sum(result)
             price += 1
         return payoff
         
 if __name__ == "__main__":
     result = Calculator()
-    print (result.calculate(Underlying("Long Underlying", 40), Underlying("Long Underlying", 50)))
+    legs = result.register_legs(Leg("Long", "Call", 50, 5), Leg("Long", "Put", 50, 5), Leg("Long", "Underlying", 0, 50))
+    strats = result.register_strategy(legs)
+    print (result.calculate(strats))
     
         
         
 
-
-    # def buy_call(self, price, strike, premium):
-    #     if price <= strike:
-    #         payoff = 0 - premium
-    #     else:
-    #         payoff = price - strike - premium
-    #     return payoff
-        
-    # def buy_put(self, price, strike, premium):
-    #     if price <= strike:
-    #         payoff = strike- price - premium
-    #     else:
-    #         payoff = 0 - premium
-    #     return payoff
-        
-    # def sell_call(self, price, strike, premium):
-    #     if price <= strike:
-    #         payoff = premium
-    #     else:
-    #         payoff = strike - price + premium
-    #     return payoff
-        
-    # def sell_put(self, price, strike, premium):
-    #     if price <= strike:
-    #         payoff = price - strike + premium
-    #     else:
-    #         payoff = premium
-    #     return payoff
-    
-    # def long_underlying(self, price, entry):
-    #     payoff = price - entry
-    #     return payoff
-        
-    # def short_underlying(self, price, entry):
-    #     payoff = entry - price
-    #     return payoff
-    
-    # def calculate(self):
-    #     leg1 = Options("Buy","Call",50,5)
-    #     leg2 = Options("Buy", "Put",50,5)
-    #     self.strategy= [leg1,leg2]
-        
-    #     j = 0
-    #     payoff = {}
-    #     while j <= 100:
-    #         payoff[j] = self.buy_call(j, self.strategy_map['Long Straddle'][0].strike, self.strategy_map['Long Straddle'][0].premium) + self.buy_put(j,self.strategy_map['Long Straddle'][1].strike, self.strategy_map['Long Straddle'][1].premium)
-    #         j += 1
-    #     print (payoff)
-        
 
 
 

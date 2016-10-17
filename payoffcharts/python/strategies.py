@@ -1,13 +1,13 @@
 from option_leg import *
 
 class LongUnderlying:
-    def calculate_payoff(self, leg, price):
-        payoff = price - leg
+    def calculate_payoff(self, strike, entry, price):
+        payoff = price - entry
         return payoff
         
 class ShortUnderlying:
-    def calculate_payoff(self, leg, price):
-        payoff = leg - price
+    def calculate_payoff(self, strike, entry, price):
+        payoff = entry - price
         return payoff
 
 class LongCall:
@@ -23,7 +23,7 @@ class ShortCall:
         if price <= strike:
             payoff = premium
         else:
-            payoff = price - strike - premium
+            payoff = strike - price + premium
         return payoff
         
 class LongPut:

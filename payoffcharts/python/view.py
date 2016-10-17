@@ -3,9 +3,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 class GraphView:
-    def __init__(self):
-        pass  
-    
     def drawgraph(self, points):
         x_axis = [i for i in points]
         y_axis = [points[i] for i in points]
@@ -17,48 +14,60 @@ class GraphView:
         plt.xlabel('Underlying Price')
         plt.ylabel('Strateg Payoff')
         plt.title('Strategy Payoff')
-        plt.savefig('Long_Underlying.jpg')
-    
+        plt.savefig('Strategy_Payoff.jpg')
 
+class View:
+    def input_entry(self):
+        while True:
+            try: 
+                entry = float(input("Please enter the entry price of the option or underlying: "))
+                break
+            except:
+                print ("Please input numbers! ")
+                continue
+        return entry
+        
+    def input_strike(self):
+        while True:
+            try: 
+                strike = float(input("Please enter the option strike: "))
+                break
+            except:
+                print ("Please input numbers! ")
+                continue
+        return strike
+    
+    def input_type(self):
+        while True:
+            typ = input("Is it a Call option, Put option or the Underlying? ")
+            if typ in ["Call", "Put", "Underlying"]:
+                break
+            else:
+                print ("Please enter 'Call', 'Put' or 'Underlying': ")
+                continue
+        return typ    
+        
+    def input_side(self):
+        while True:
+            side = input("Do you want to Long or Short? ")
+            if side in ["Long", "Short"]:
+                break
+            else:
+                print ("Please enter either 'Long' or 'Short': ")
+                continue
+        return side
+        
+    def register_leg(self):
+        answer = input("Enter 'Y' to register a leg? ")
+        if answer in ["Y", "y"]:
+            return answer
+
+        
 if __name__ == "__main__":
-    graph = GraphView()
-    graph.drawgraph({0: 1, 1: 2, 2: 3})
-
-    
-# class View:
-#     def input_premium(self):
-#         premium = input("Please enter the option premium: ")
-#         return premium
-        
-#     def input_strike(self):
-#         strike = input("Please enter the option strike: ")
-#         return strike
-    
-#     def input_type(self):
-#         typ = input("Is it a call option or a put option? ")
-#         if typ.upper() in ["CALL","PUT"]:
-#             return typ.upper()
-#         else:
-#             print ("Please enter either call or put: ")
-#             self.input_type()
-    
-#     def input_action(self):
-#         action = input("Do you want to buy or sell? ")
-#         if action.upper() in ["BUY","SELL"]:
-#             return action.upper()
-#         else:
-#             print ("Please enter either buy or sell: ")
-#             self.input_action()
-    
-#     def input_entry(self):
-#         price = input("Please enter your entry price: ")
-#         return price
-        
-#     def input_underlying(self):
-#         underlying = input("Please enter Y if you want to take positions in the option underlying: ")
-#         if underlying in ["Y","y"]:
-#             return True
-    
-#     def input_stratname(self):
-#         name = input("Please enter the name of the strategy: ")
-#         return name
+    # graph = GraphView()
+    # graph.drawgraph({0: 1, 1: 2, 2: 3})
+    view = View()
+    print (view.input_entry())
+    print (view.input_strike())
+    print (view.input_side())
+    print (view.input_type())
