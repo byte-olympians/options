@@ -11,12 +11,13 @@ class Controller:
     def input_legs(self):
         side = self.view.input_side()
         typ = self.view.input_type()
-        entry_price = self.view.input_entry()
         if typ == "Underlying":
             strike = 0
         else:
             strike = self.view.input_strike()
-        return Leg(side, typ, strike, entry_price)    
+        entry_price = self.view.input_entry()
+        amount = self.view.input_amount()
+        return Leg(side, typ, strike, entry_price, amount)    
         
     def register(self):
         legs = []
@@ -35,6 +36,7 @@ class Controller:
         
     def get_strategy_payoff(self):
         legs = self.register()
+        self.view.print_legs(legs)
         strats = self.calculator.register_strategy(legs)
         payoff = self.calculator.calculate(strats)
         self.plotter.drawgraph(payoff)

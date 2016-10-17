@@ -3,16 +3,16 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 class GraphView:
-    def drawgraph(self, points):
-        x_axis = [i for i in points]
-        y_axis = [points[i] for i in points]
-        # x_ticks = [i for i in range(0, 100, 10)]
-        # y_ticks = [i for i in range(-100, 120 ,10)]
+    def drawgraph(self, payoffs):
+        x_axis = [i for i in payoffs]
+        y_axis = [payoffs[i] for i in payoffs]
+        x_ticks = [i for i in range(0, 100, 10)]
+        y_ticks = [i for i in range(-1000, 1200 ,200)]
         plt.plot(x_axis, y_axis)
-        # plt.xticks(x_ticks)
-        # plt.yticks(y_ticks)
+        plt.xticks(x_ticks)
+        plt.yticks(y_ticks)
         plt.xlabel('Underlying Price')
-        plt.ylabel('Strateg Payoff')
+        plt.ylabel('Payoff')
         plt.title('Strategy Payoff')
         plt.savefig('Strategy_Payoff.jpg')
 
@@ -20,7 +20,7 @@ class View:
     def input_entry(self):
         while True:
             try: 
-                entry = float(input("Please enter the entry price of the option or underlying: "))
+                entry = float(input("Please enter the entry price: "))
                 break
             except:
                 print ("Please input numbers! ")
@@ -30,12 +30,22 @@ class View:
     def input_strike(self):
         while True:
             try: 
-                strike = float(input("Please enter the option strike: "))
+                strike = int(input("Please enter the option strike: "))
                 break
             except:
-                print ("Please input numbers! ")
+                print ("Please input integers! ")
                 continue
         return strike
+    
+    def input_amount(self):
+        while True:
+            try: 
+                amount = int(input("Please enter the trading amount: "))
+                break
+            except:
+                print ("Please input integers! ")
+                continue
+        return amount
     
     def input_type(self):
         while True:
@@ -58,15 +68,22 @@ class View:
         return side
         
     def register_leg(self):
-        answer = input("Enter 'Y' to register a leg? ")
-        if answer in ["Y", "y"]:
-            return answer
-
+        response = input("Enter 'Y' to register a leg? ")
+        if response in ['Y', 'y']:
+            return True
+            
+    def print_legs(self, legs):
+        for leg in legs:
+            if leg.typ == "Underlying":
+                print ("Strategy Leg:\n%s %d share(s) %s for $%0.2f" %(leg.side, leg.amount, leg.typ, leg.entry_price))
+            else:
+                print ("Strategy Leg:\n%s %d share(s) $%d %s for $%0.2f" %(leg.side, leg.amount, leg.strike, leg.typ, leg.entry_price))
         
 if __name__ == "__main__":
     # graph = GraphView()
     # graph.drawgraph({0: 1, 1: 2, 2: 3})
     view = View()
+    print (view.register_leg())
     print (view.input_entry())
     print (view.input_strike())
     print (view.input_side())

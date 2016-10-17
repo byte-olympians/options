@@ -30,14 +30,21 @@ class Calculator:
         while price <= 100:
             result = []
             for strat in strategies:
-                result.append(strategies[strat][1].calculate_payoff(strategies[strat][0].strike, strategies[strat][0].entry_price, price)) 
+                result.append(strategies[strat][1].calculate_payoff(
+                            strategies[strat][0].strike, 
+                            strategies[strat][0].entry_price, 
+                            price,
+                            strategies[strat][0].amount)) 
                 payoff[price] = sum(result)
             price += 1
         return payoff
         
 if __name__ == "__main__":
     result = Calculator()
-    legs = result.register_legs(Leg("Long", "Call", 50, 5), Leg("Long", "Put", 50, 5), Leg("Long", "Underlying", 0, 50))
+    legs = result.register_legs(Leg("Long", "Underlying", 0, 50, 100), 
+                                Leg("Short", "Call", 55, 0.5, 1), 
+                                Leg("Long", "Put", 45, 0.5, 2),
+                                Leg("Short", "Put", 48, 1.5, 1))
     strats = result.register_strategy(legs)
     print (result.calculate(strats))
     
