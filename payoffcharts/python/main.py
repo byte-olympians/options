@@ -7,38 +7,11 @@ class Controller:
         self.calculator = Calculator()
         self.plotter = GraphView()
         self.view = View()
-    
-    def input_legs(self):
-        side = self.view.input_side()
-        typ = self.view.input_type()
-        if typ == "Underlying":
-            strike = 0
-        else:
-            strike = self.view.input_strike()
-        entry_price = self.view.input_entry()
-        amount = self.view.input_amount()
-        return Leg(side, typ, strike, entry_price, amount)    
-        
-    def register(self):
-        legs = []
-        while True:
-            while True:
-                if self.view.register_leg(): 
-                    legs.append(self.input_legs())
-                    continue
-                else:
-                    break
-            if legs is not None:
-                break
-            else:
-                continue
-        return legs
         
     def get_strategy_payoff(self):
-        legs = self.register()
+        legs = self.view.register_legs()
         self.view.print_legs(legs)
-        strats = self.calculator.register_strategy(legs)
-        payoff = self.calculator.calculate(strats)
+        payoff = self.calculator.calculate(legs)
         self.plotter.drawgraph(payoff)
 
 if __name__ == "__main__":

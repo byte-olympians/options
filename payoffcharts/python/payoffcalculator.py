@@ -13,40 +13,25 @@ class Calculator:
                             "ShortPut": ShortPut()
                             }
                             
-    def register_legs(self, *args):
-        legs =[leg for leg in args]
-        return legs
-    
-    def register_strategy(self, legs):
-        registered_strategies = {}
-        for leg in legs:
-            if leg.get_key() in self.strategy_map:
-                registered_strategies[leg.get_key()] = [leg, self.strategy_map[leg.get_key()]]
-        return registered_strategies
-        
-    def calculate(self, strategies):
+    def calculate(self, legs):
         price = 0
         payoff = {}
         while price <= 100:
-            result = []
-            for strat in strategies:
-                result.append(strategies[strat][1].calculate_payoff(
-                            strategies[strat][0].strike, 
-                            strategies[strat][0].entry_price, 
-                            price,
-                            strategies[strat][0].amount)) 
-                payoff[price] = sum(result)
+            value = 0
+            for leg in legs:
+                strat = self.strategy_map[leg.get_key()]
+                value += strat.calculate_payoff(price, leg)
+            payoff[price] = value
             price += 1
         return payoff
         
 if __name__ == "__main__":
     result = Calculator()
-    legs = result.register_legs(Leg("Long", "Underlying", 0, 50, 100), 
-                                Leg("Short", "Call", 55, 0.5, 1), 
-                                Leg("Long", "Put", 45, 0.5, 2),
-                                Leg("Short", "Put", 48, 1.5, 1))
-    strats = result.register_strategy(legs)
-    print (result.calculate(strats))
+    print (result.calculate([Leg("Long", "Underlying", 0, 50, 100), 
+                            Leg("Short", "Call", 55, 1, 1),
+                            Leg("Short", "Put", 48, 1.5, 1),
+                            Leg("Long", "Put", 45, 0.5, 1),
+                            Leg("Long", "Put", 42, 0.1, 1)]))
     
         
         

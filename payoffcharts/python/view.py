@@ -1,3 +1,4 @@
+from option_leg import Leg
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -67,24 +68,44 @@ class View:
                 continue
         return side
         
-    def register_leg(self):
+    def leg_inputs(self):
+        side = self.input_side()
+        typ = self.input_type()
+        if typ == "Underlying":
+            strike = 0
+        else:
+            strike = self.input_strike()
+        entry = self.input_entry()
+        amount = self.input_amount()
+        return Leg(side, typ, strike, entry, amount)
+        
+    def register_leg_msg(self):
         response = input("Enter 'Y' to register a leg? ")
         if response in ['Y', 'y']:
             return True
             
+    def register_legs(self):
+        legs = []
+        while True:
+            legs.append(self.leg_inputs())
+            if self.register_leg_msg(): 
+                continue
+            else:
+                break
+        return legs
+    
     def print_legs(self, legs):
         for leg in legs:
             if leg.typ == "Underlying":
-                print ("Strategy Leg:\n%s %d share(s) %s for $%0.2f" %(leg.side, leg.amount, leg.typ, leg.entry_price))
+                print ("Strategy Leg:\n%s %d share(s) %s for $%0.2f" %(leg.side, leg.amount, leg.typ, leg.entry))
             else:
-                print ("Strategy Leg:\n%s %d share(s) $%d %s for $%0.2f" %(leg.side, leg.amount, leg.strike, leg.typ, leg.entry_price))
+                print ("Strategy Leg:\n%s %d share(s) $%d %s for $%0.2f" %(leg.side, leg.amount, leg.strike, leg.typ, leg.entry))
         
 if __name__ == "__main__":
-    # graph = GraphView()
-    # graph.drawgraph({0: 1, 1: 2, 2: 3})
     view = View()
-    print (view.register_leg())
     print (view.input_entry())
     print (view.input_strike())
     print (view.input_side())
     print (view.input_type())
+    view.print_legs([Leg("Short", "Underlying", 0, 80, 100), 
+                    Leg("Short", "Put", 75, 1, 1)])

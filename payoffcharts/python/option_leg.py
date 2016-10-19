@@ -1,6 +1,6 @@
 class Leg:
     def __init__(self, side, typ, strike, premium, amount):
-        self.entry_price = premium 
+        self.entry = premium 
         self.strike = strike
         self.typ = typ
         self.side = side
